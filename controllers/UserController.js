@@ -158,11 +158,11 @@ export const getMe = async (req, res) => {
   }
 };
 
-export const setAccountSettings = async (req, res) => {
+export const setTheme = async (req, res) => {
   try {
     const { _id, ...theme } = req.body;
     if (!_id || !theme) return;
-    const updatedUser = await User.findByIdAndUpdate(_id, theme,
+    const updatedUser = await User.findByIdAndUpdate(_id, { theme },
       { new: true, select: "-passwordHash -updatedAt -createdAt -__v" }
     );
     if (!updatedUser) {
@@ -190,6 +190,30 @@ export const setAccountSettings = async (req, res) => {
         type: "error",
         message: "Қате",
         description: "Қолданушы стильін өзгерту кезіндегі ескерту",
+      },
+    });
+  }
+};
+
+export const getStudents = async (req, res) => {
+  try {
+    if (!req.userId || !await User.findById(req.userId)) 
+      return res.status(400).json({
+        status: {
+          type: "error",
+          message: "Қате",
+          description: "Мұғалім ID-і қате!",
+        },
+      });
+
+    res.json(await User.find({ supervisor: req.userId })
+    .select("-supervisor -passwordHash -__v -updatedAt -createdAt"));
+  } catch (err) {
+    res.status(500).json({
+      status: {
+        type: "error",
+        message: "Қате",
+        description: "Қолданушыны жүйеден іздеу кезіндегі ескерту",
       },
     });
   }

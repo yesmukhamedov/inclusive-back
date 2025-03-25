@@ -45,13 +45,20 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     },
+    class: {
+        type: Number,
+        required: false,
+        default: 0,
+        min: 0,
+        max: 4,
+    },
     special: {
         type: Boolean,
-        default: true,
+        default: false,
     },
     theme: {
         type: Theme,
-        required: ()=>this.special,
+        required: false, //()=>this.special
     }
 }, {
     timestamps: true,
