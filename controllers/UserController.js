@@ -42,8 +42,7 @@ export const register = async (req, res) => {
       fullName: req.body.fullName,
       email: req.body.email,
       passwordHash: hash,
-      supervisor: supervisorObjectId,
-      avatarUrl: req.body.avatarUrl,
+      supervisor: supervisorObjectId
     });
 
     await user.save();
@@ -159,15 +158,11 @@ export const getMe = async (req, res) => {
   }
 };
 
-export const setTheme = async (req, res) => {
+export const setAccountSettings = async (req, res) => {
   try {
-    const { _id, theme } = req.body;
-    if (!_id || !theme) {
-      return;
-    }
-    const updatedUser = await User.findByIdAndUpdate(
-      _id,
-      { theme: theme },
+    const { _id, ...theme } = req.body;
+    if (!_id || !theme) return;
+    const updatedUser = await User.findByIdAndUpdate(_id, theme,
       { new: true, select: "-passwordHash -updatedAt -createdAt -__v" }
     );
     if (!updatedUser) {
@@ -181,9 +176,13 @@ export const setTheme = async (req, res) => {
     }
 
     const { passwordHash, __v, createdAt, updatedAt, ...userData } = updatedUser._doc;
-
     res.json({
-        user: userData
+      status: {
+        type: "success",
+        message: "Сәтті орындалды",
+        description: `${userData.fullName} өзгерістері сәтті сақталды!`,
+      },
+      user: userData,
     });
   } catch (error) {
     res.status(500).json({
