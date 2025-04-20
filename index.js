@@ -18,7 +18,7 @@ config();
 mongoose
     .connect(process.env.MONGODB)
     .then(()=>console.log('DB connection OK'))
-    .catch(err=>console.log('error', err))
+    .catch(err=>console.log('DB connection error', err))
 
 const app = express();
  app.use(cors())
@@ -49,8 +49,8 @@ app.post('/login', validation.login, handleValidationErrors, UserController.logi
 app.post('/register', validation.register, handleValidationErrors, UserController.register);
 app.get('/auth/me', checkAuth, UserController.getMe);
 
-app.post('/set-theme', checkAuth, UserController.setTheme);
-app.get('/students', checkAuth, UserController.getStudents)
+app.post('/students/set-theme/:_id', checkAuth, UserController.setTheme);
+app.get('/students/list', checkAuth, UserController.getStudents)
 
 app.get('/quiz/:collectionName/:count', checkAuth, TestController.getQuiz);
 app.post('/quiz/checking', checkAuth, TestController.checking);
@@ -73,7 +73,7 @@ app.post('/upload', checkAuth, upload.single('recfile'), (req, res) => {
 
 app.listen(process.env.PORT || 4444, (err) => {
     if(err) 
-        return console.log(err);
+        return console.log("Server connection error", err);
 
-    console.log('server OK on ', process.env.PORT || 4444);
+    console.log('Server OK on ', process.env.PORT || 4444);
 })

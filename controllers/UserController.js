@@ -83,12 +83,7 @@ export const login = async (req, res) => {
         },
       });
 
-    const isValidPass = await bcryptjs.compare(
-      req.body.password,
-      user._doc.passwordHash
-    );
-
-    if (!isValidPass)
+    if (!await bcryptjs.compare(req.body.password, user._doc.passwordHash))
       return res.status(404).json({
         status: {
           type: "error",
@@ -96,8 +91,6 @@ export const login = async (req, res) => {
           description: "Электронды почта немесе құпиясөз қате!",
         },
       });
-
-    const token = jwt.sign({ _id: user._id }, "key", { expiresIn: "30d" });
 
     const { passwordHash, __v, createdAt, updatedAt, ...userData } = user._doc;
 
@@ -107,7 +100,7 @@ export const login = async (req, res) => {
         message: "Қош келдіңіз!",
         description: "Жүйеге кіру сәтті орындалды",
       },
-      user: { ...userData, token },
+      user: { ...userData, token: jwt.sign({ _id: user._id }, "key", { expiresIn: "30d" }) },
     });
   } catch (err) {
     console.log(err);
@@ -160,9 +153,9 @@ export const getMe = async (req, res) => {
 
 export const setTheme = async (req, res) => {
   try {
-    const { _id, ...theme } = req.body;
-    if (!_id || !theme) return;
-    const updatedUser = await User.findByIdAndUpdate(_id, { theme },
+    const { theme } = req.body;
+    if (!req.params._id || !theme) return;
+    const updatedUser = await User.findByIdAndUpdate(req.params._id, { theme },
       { new: true, select: "-passwordHash -updatedAt -createdAt -__v" }
     );
     if (!updatedUser) {

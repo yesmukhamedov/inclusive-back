@@ -5,7 +5,11 @@ const Theme = new mongoose.Schema({
         type: String,
         required: true,
     },
-    color: {
+    textColor: {
+        type: String,
+        required: true,
+    },
+    backgroundColor: {
         type: String,
         required: true,
     },
@@ -20,6 +24,10 @@ const Theme = new mongoose.Schema({
     subtitle: {
         type: Boolean,
         default: false,
+    },
+    theme: {
+        type: String,
+        default: "light",
     },
 }, {
     timestamps: false,
